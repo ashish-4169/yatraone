@@ -1,5 +1,5 @@
 import { MapPin, Navigation, Share2, AlertTriangle, Clock } from 'lucide-react';
-import { JourneyStep, RouteSegment } from '../data/mockData';
+import { JourneyStep } from '../data/mockData';
 
 interface DetailScreenProps {
   steps: JourneyStep[];

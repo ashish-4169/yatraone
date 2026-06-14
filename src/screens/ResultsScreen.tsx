@@ -14,11 +14,12 @@ interface ResultsScreenProps {
   routes: Route[];
   selectedRouteId: number | null;
   setSelectedRouteId: (id: number) => void;
+  aiInsight?: string;
 }
 
-export function ResultsScreen({ routes, selectedRouteId, setSelectedRouteId }: ResultsScreenProps) {
+export function ResultsScreen({ routes, selectedRouteId, setSelectedRouteId, aiInsight }: ResultsScreenProps) {
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
-  const [lockTime, setLockTime] = useState(Date.now() + 9 * 60 * 1000 + 45 * 1000);
+  const [lockTime] = useState(Date.now() + 9 * 60 * 1000 + 45 * 1000);
 
   const randomInsight = useMemo(() => {
     return aiInsights[Math.floor(Math.random() * aiInsights.length)];
@@ -85,7 +86,7 @@ export function ResultsScreen({ routes, selectedRouteId, setSelectedRouteId }: R
             </span>
           </div>
           <p className="text-sm text-indigo-100">
-            {randomInsight}
+            {aiInsight || randomInsight}
           </p>
         </div>
       </div>

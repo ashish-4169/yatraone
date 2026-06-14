@@ -6,7 +6,9 @@ import { DetailScreen } from './screens/DetailScreen';
 import { SafetyScreen } from './screens/SafetyScreen';
 import { BookScreen } from './screens/BookScreen';
 import { CarbonScreen } from './screens/CarbonScreen';
-import { mockRoutes, mockJourneySteps } from './data/mockData';
+import { mockRoutes, mockJourneySteps, Route } from './data/mockData';
+import { scoreAndRankRoutes, Preference } from './engine/routeScorer';
+import { generateAiInsight } from './engine/aiInsights';
 
 type TabType = 'home' | 'results' | 'detail' | 'safety' | 'book' | 'carbon';
 
@@ -21,20 +23,39 @@ const tabs: { id: TabType; label: string; icon: typeof Home }[] = [
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
-  const [preferences, setPreferences] = useState<string[]>(['Fastest']);
+  const [preferences, setPreferences] = useState<Preference[]>(['Fastest']);
   const [safeMode, setSafeMode] = useState(true);
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
+  const [rankedRoutes, setRankedRoutes] = useState<Route[]>(mockRoutes);
+  const [aiInsight, setAiInsight] = useState<string>('');
 
-  const togglePreference = useCallback((pref: string) => {
+  const togglePreference = useCallback((pref: Preference) => {
     setPreferences((prev) =>
       prev.includes(pref) ? prev.filter((p) => p !== pref) : [...prev, pref]
     );
   }, []);
 
   const handleSearch = useCallback(() => {
+    const hour = new Date().getHours();
+    const isPeakHour = (hour >= 8 && hour <= 10) || (hour >= 17 && hour <= 20);
+
+    // Run the scoring engine with current preferences
+    const scored = scoreAndRankRoutes(mockRoutes, preferences);
+
+    // If Women Safe is selected, boost safety filter
+    const filtered = preferences.includes('Women Safe')
+      ? scored.map((r) => ({ ...r, safety: Math.min(100, r.safety + 5) }))
+      : scored;
+
+    setRankedRoutes(filtered);
+    setSelectedRouteId(filtered[0]?.id ?? 1);
+
+    // Generate AI insight based on top route + preferences
+    const insight = generateAiInsight(filtered[0], filtered, isPeakHour, preferences);
+    setAiInsight(insight);
+
     setActiveTab('results');
-    setSelectedRouteId(1);
-  }, []);
+  }, [preferences]);
 
   const handleShareLocation = useCallback(() => {
     alert('📍 Live location shared with Priya (trusted contact)');
@@ -56,7 +77,6 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center font-sans">
       <div className="w-full max-w-[390px] bg-white relative min-h-screen shadow-2xl">
-        {/* Screen Content */}
         <div className="pb-16">
           {activeTab === 'home' && (
             <HomeScreen
@@ -69,9 +89,10 @@ function App() {
           )}
           {activeTab === 'results' && (
             <ResultsScreen
-              routes={mockRoutes}
+              routes={rankedRoutes}
               selectedRouteId={selectedRouteId}
               setSelectedRouteId={handleRouteSelect}
+              aiInsight={aiInsight}
             />
           )}
           {activeTab === 'detail' && (

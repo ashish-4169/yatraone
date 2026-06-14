@@ -53,6 +53,10 @@ export interface ScoredRoute extends Route {
   aiExplanation: string;
 }
 
+export function scoreAndRankRoutes(routes: Route[], preferences: Preference[]): ScoredRoute[] {
+  return assignTags(scoreRoutes(routes, preferences));
+}
+
 export function scoreRoutes(routes: Route[], preferences: Preference[]): ScoredRoute[] {
   const weights = mergeWeights(preferences);
 

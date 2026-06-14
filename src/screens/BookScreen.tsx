@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Gift, Check, ChevronDown, ChevronUp, CreditCard, Wallet } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, CreditCard, Wallet } from 'lucide-react';
 
 export function BookScreen() {
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'card' | 'wallet'>('upi');

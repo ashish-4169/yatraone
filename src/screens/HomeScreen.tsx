@@ -1,9 +1,10 @@
 import { MapPin, Clock, ArrowUpDown, Shield, Search } from 'lucide-react';
 import { preferenceOptions } from '../data/mockData';
+import { Preference } from '../engine/routeScorer';
 
 interface HomeScreenProps {
-  preferences: string[];
-  togglePreference: (pref: string) => void;
+  preferences: Preference[];
+  togglePreference: (pref: Preference) => void;
   safeMode: boolean;
   setSafeMode: (value: boolean) => void;
   onSearch: () => void;
@@ -68,9 +69,9 @@ export function HomeScreen({
             {preferenceOptions.map((pref) => (
               <button
                 key={pref}
-                onClick={() => togglePreference(pref)}
+                onClick={() => togglePreference(pref as Preference)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  preferences.includes(pref)
+                  preferences.includes(pref as Preference)
                     ? 'bg-coral-orange text-white'
                     : 'bg-white border border-gray-300 text-gray-600'
                 }`}
